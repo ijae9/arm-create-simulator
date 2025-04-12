@@ -1,57 +1,133 @@
-/* style.css */
+/* 기본 (라이트 모드) */
 body {
-    font-family: sans-serif;
-    background-color: #f9f9f9;
-    padding: 20px;
+    font-family: 'Pretendard', sans-serif;
+    background-color: #f5f6fa;
+    color: #2f3640;
+    padding: 16px;
+    margin: 0;
   }
   
   .container {
-    max-width: 400px;
+    max-width: 480px;
     margin: auto;
-    padding: 20px;
+    padding: 24px;
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e6e9ef;
   }
   
   .container h1 {
+    font-size: 22px;
+    font-weight: 600;
     text-align: center;
+    margin-bottom: 20px;
+    color: #2f3640;
   }
   
   label {
     display: block;
-    margin-top: 15px;
-    font-weight: bold;
+    margin-top: 18px;
+    font-weight: 500;
+    font-size: 14px;
+    color: #353b48;
   }
   
-  select, input[type="number"] {
+  select,
+  input[type="number"] {
     width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border-radius: 6px;
+    padding: 10px 12px;
+    margin-top: 6px;
+    font-size: 14px;
+    border-radius: 12px;
     border: 1px solid #ccc;
+    background-color: #fff;
+    color: #2f3640;
+  }
+  
+  select:focus,
+  input[type="number"]:focus {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 12px;
+    box-sizing: border-box;
+    border-color: #6c8df5;
+    box-shadow: 0 0 0 2px rgba(108, 141, 245, 0.3);
+    outline: none;
   }
   
   button {
-    margin-top: 20px;
+    margin-top: 24px;
     width: 100%;
-    padding: 10px;
-    background-color: #4287f5;
+    padding: 12px;
+    background-color: #6c8df5;
     color: white;
+    font-size: 15px;
+    font-weight: 600;
     border: none;
-    border-radius: 6px;
-    font-size: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+  }
+  
+  button:hover {
+    background-color: #5a77d4;
   }
   
   .result-box {
-    margin-top: 30px;
-    padding: 15px;
-    border-radius: 10px;
-    background-color: #f0f8ff;
-    border: 1px solid #aad;
+    margin-top: 36px;
+    padding: 20px;
+    border-radius: 16px;
+    background-color: #e9f0ff;
+    border: 1px solid #c2d4f8;
   }
   
   .result-box h2 {
     text-align: center;
-    margin-bottom: 10px;
+    font-size: 18px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    color: #3a55c0;
   }
+  
+  /* 다크 모드 스타일 */
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: #181a1b;
+      color: #f1f1f1;
+    }
+  
+    .container {
+      background: #242526;
+      border-color: #333;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+  
+    .container h1,
+    label {
+      color: #ccc;
+    }
+  
+    select,
+    input[type="number"] {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+        border-radius: 12px;
+        box-sizing: border-box;
+        background-color: #1e1f20;
+      color: #eee;
+      border-color: #555;
+    }
+  
+    .result-box {
+      background-color: #2a2b2e;
+      border-color: #444;
+    }
+  
+    .result-box h2 {
+      color: #88aaff;
+    }
+  }
+  
