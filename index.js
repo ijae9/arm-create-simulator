@@ -31,9 +31,9 @@ async function createWeapon() {
   document.getElementById("result-weight-min").textContent = equipment.weight.min;
   document.getElementById("result-weight-max").textContent = equipment.weight.max;
   
-  document.getElementById("result-price").textContent = equipment.price.value;
-  document.getElementById("result-price-min").textContent = equipment.price.min;
-  document.getElementById("result-price-max").textContent = equipment.price.max;
+  document.getElementById("result-price").textContent = equipment.price.value.toLocaleString();
+  document.getElementById("result-price-min").textContent = equipment.price.min.toLocaleString();
+  document.getElementById("result-price-max").textContent = equipment.price.max.toLocaleString();
 
   document.getElementById("result").style.display = "block";
 }
