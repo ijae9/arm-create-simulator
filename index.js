@@ -23,9 +23,17 @@ async function createWeapon() {
   );
 
   // 결과 출력
-  document.getElementById("result-power").textContent = equipment.damage;
-  document.getElementById("result-weight").textContent = equipment.weight;
-  document.getElementById("result-price").textContent = equipment.price;
+  document.getElementById("result-power").textContent = equipment.damage.value;
+  document.getElementById("result-power-min").textContent = equipment.damage.min;
+  document.getElementById("result-power-max").textContent = equipment.damage.max;
+
+  document.getElementById("result-weight").textContent = equipment.weight.value;
+  document.getElementById("result-weight-min").textContent = equipment.weight.min;
+  document.getElementById("result-weight-max").textContent = equipment.weight.max;
+  
+  document.getElementById("result-price").textContent = equipment.price.value;
+  document.getElementById("result-price-min").textContent = equipment.price.min;
+  document.getElementById("result-price-max").textContent = equipment.price.max;
 
   document.getElementById("result").style.display = "block";
 }

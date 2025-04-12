@@ -40,13 +40,21 @@ pub enum ElementType {
 
 #[derive(Serialize, Debug)]
 struct Equipment {
-    damage: i32,
-    weight: i32,
-    price: i32,
+    damage: OptionWithRange,
+    weight: OptionWithRange,
+    price: OptionWithRange,
 }
 
+#[derive(Serialize, Debug)]
+pub struct OptionWithRange {
+    value: i32,
+    min: i32,
+    max: i32,
+}
+
+
 impl Equipment {
-    fn new(damage: i32, weight: i32, price: i32) -> Self {
+    fn new(damage: OptionWithRange, weight: OptionWithRange, price: OptionWithRange) -> Self {
         Equipment { damage, weight, price }
     }
 }
@@ -77,40 +85,84 @@ fn sqrt(x: i32) -> i32 {
 }
 
 fn make_arm(damage_price: i32, weigh_price: i32, bonus: f64, weapon_type: &WeaponType) -> Equipment {
-    let mut damage = calc_arm_damage(damage_price, weigh_price, bonus);
-    let mut weigh = calc_arm_weigh(damage, weigh_price, bonus);
-    let price = calc_arm_price(damage, weigh);
+    let (mut damage, mut min_damage, mut max_damage) = calc_arm_damage(damage_price, weigh_price, bonus);
+    let mut weigh= calc_arm_weigh(damage, weigh_price, bonus);
+    let mut min_weigh = calc_arm_weigh_vertax(min_damage, weigh_price, bonus, true);
+    let mut max_weigh = calc_arm_weigh_vertax(max_damage, weigh_price, bonus, false);
+
+    let (price, min_price, max_price) = calc_arm_price(damage, weigh);
 
     match weapon_type {
-        WeaponType::Axe => { damage = (damage as f64 * 1.15) as i32 ; weigh += 20; },
-        WeaponType::Knuckle => { damage = (damage as f64 * 0.8) as i32 ; weigh -= 5; },
-        WeaponType::Bow => { damage = (damage as f64 * 1.1) as i32 ; weigh += 12; },
-        WeaponType::MagicWand => { damage = (damage as f64 * 0.9) as i32 ; weigh -= 5; },
-        WeaponType::Knife => { damage = (damage as f64 * 0.95) as i32 ; weigh -= 3; },
+        WeaponType::Axe => { 
+            damage = (damage as f64 * 1.15) as i32 ; weigh += 20; 
+            min_damage = (min_damage as f64 * 1.15) as i32; max_damage = (max_damage as f64 * 1.15) as i32;
+            min_weigh += 20; max_weigh += 20;
+        },
+        WeaponType::Knuckle => { 
+            damage = (damage as f64 * 0.8) as i32 ; weigh -= 5; 
+            min_damage = (min_damage as f64 * 0.8) as i32; max_damage = (max_damage as f64 * 0.8) as i32;
+            min_weigh -= 5; max_weigh -= 5;
+        
+        },
+        WeaponType::Bow => { 
+            damage = (damage as f64 * 1.1) as i32 ; weigh += 12;
+            min_damage = (min_damage as f64 * 1.1) as i32; max_damage = (max_damage as f64 * 1.1) as i32;
+            min_weigh += 12; max_weigh += 12;
+        },
+        WeaponType::MagicWand => { 
+            damage = (damage as f64 * 0.9) as i32 ; weigh -= 5;
+            min_damage = (min_damage as f64 * 0.9) as i32; max_damage = (max_damage as f64 * 0.9) as i32;
+            min_weigh -= 5; max_weigh -= 5;
+        },
+        WeaponType::Knife => { 
+            damage = (damage as f64 * 0.95) as i32 ; weigh -= 3;
+            min_damage = (min_damage as f64 * 0.95) as i32; max_damage = (max_damage as f64 * 0.95) as i32;
+            min_weigh -= 3; max_weigh -= 3;
+        },
         _ => {}
     }
 
-    Equipment::new(damage, weigh, price)
+    let damage = OptionWithRange { value: damage, min: min_damage, max: max_damage };
+    let weight = OptionWithRange { value: weigh, min: min_weigh, max: max_weigh };
+    let price = OptionWithRange { value: price, min: min_price, max: max_price };
+
+    Equipment::new(damage, weight, price)
 }
 
 fn make_acc(damage_price: i32, weigh_price: i32, bonus: f64) -> Equipment{
-    let damage = calc_acc_damage(damage_price, weigh_price, bonus);
+    let (damage, min_damage, max_damage) = calc_acc_damage(damage_price, weigh_price, bonus);
     let weigh = calc_acc_weigh(damage, weigh_price, bonus);
-    let price = calc_acc_price(damage, weigh);
+    let min_weigh = calc_acc_weight_vertax(min_damage, weigh_price, bonus, true);
+    let max_weigh = calc_acc_weight_vertax(max_damage, weigh_price, bonus, false);
 
-    Equipment::new(damage, weigh, price)
+    let (price, min_price, max_price) = calc_acc_price(damage, weigh);
+
+    let damage = OptionWithRange { value: damage, min: min_damage, max: max_damage };
+    let weight = OptionWithRange { value: weigh, min: min_weigh, max: max_weigh };
+    let price = OptionWithRange { value: price, min: min_price, max: max_price };
+
+    Equipment::new(damage, weight, price)
 }
 
-fn calc_acc_damage(damage_price: i32, weigh_price: i32, bonus: f64) -> i32 {
+fn calc_acc_damage(damage_price: i32, weigh_price: i32, bonus: f64) -> (i32, i32, i32) {
     let mut rng = rand::thread_rng();
     
+    let mut min_damage: i32 = (sqrt(damage_price) / 3) + 0 - (sqrt(weigh_price) / 5);
+    let mut max_damage: i32 = (sqrt(damage_price) / 3) + sqrt(damage_price) - 0; 
     let mut acc_damage: i32 = (sqrt(damage_price) / 3) + rng.gen_range(0..(sqrt(damage_price))) - rng.gen_range(0..(sqrt(weigh_price) / 5)); 
+    
     if acc_damage > 55 + (bonus * 50.0) as i32 {
         acc_damage = 55 + (bonus * 50.0) as i32
     }
+    if max_damage > 55 + (bonus * 50.0) as i32 {
+        max_damage = 55 + (bonus * 50.0) as i32
+    }
 
+    min_damage += rng.gen_range(0..((bonus * 20.0) as i32) + 3);
+    max_damage += rng.gen_range(0..((bonus * 20.0) as i32) + 3);
     acc_damage += rng.gen_range(0..((bonus * 20.0) as i32) + 3);
-    acc_damage
+    
+    (acc_damage, min_damage, max_damage)
 }
 
 fn calc_acc_weigh(damage: i32, weigh_price: i32, bonus: f64) -> i32 {
@@ -134,7 +186,42 @@ fn calc_acc_weigh(damage: i32, weigh_price: i32, bonus: f64) -> i32 {
     acc_weigh
 }
 
-fn calc_acc_price(damage: i32, weigh: i32) -> i32 {
+fn calc_acc_weight_vertax(damage: i32, weigh_price: i32, bonus:f64, is_min: bool) -> i32 {    
+    let mut acc_weigh: i32;
+    if is_min {
+        if damage < 50 {
+            acc_weigh = damage - sqrt(weigh_price) - (sqrt(weigh_price) * 2);
+            acc_weigh -= ((bonus * 10.0) as i32) + 2;
+            if acc_weigh < 0 {
+                acc_weigh = -10;
+            }
+        }
+        else {
+            acc_weigh = damage - (sqrt(weigh_price) / 2) - sqrt(weigh_price);
+            acc_weigh -= ((bonus * 10.0) as i32) + 2;
+            if acc_weigh < 5 {
+                acc_weigh = 0;
+            }
+        }
+    }
+    else { // maximum
+        if damage < 50 {
+            acc_weigh = damage - sqrt(weigh_price);
+            if acc_weigh < 0 {
+                acc_weigh = 0;
+            }
+        }
+        else {
+            acc_weigh = damage - (sqrt(weigh_price) / 2);
+            if acc_weigh < 5 {
+                acc_weigh = 5;
+            }
+        }
+    }
+    acc_weigh
+}
+
+fn calc_acc_price(damage: i32, weigh: i32) -> (i32, i32, i32) {
     let mut sa = damage - weigh;
     if sa < 1 {
         sa = 1;
@@ -159,26 +246,56 @@ fn calc_acc_price(damage: i32, weigh: i32) -> i32 {
     
     let mut rng = rand::thread_rng();
     price= ((price as f64 * 0.8) + (rng.gen_range(0.0..(price as f64 * 0.4)))) as i32;
-	if price < 1000 {
+	let mut min_price = (price as f64 * 0.8) as i32;
+    let mut max_price = (price as f64 * 1.2) as i32;
+    
+    if price < 1000 {
         price =1000;
     }
-    price
+    if min_price < 1000 {
+        min_price = 1000;
+    }
+    if max_price < 1000 {
+        max_price = 1000;
+    }
+
+    (price, min_price, max_price)
 }
 
-fn calc_arm_damage(damage_price: i32, weigh_price: i32, bonus: f64) -> i32 {
+fn calc_arm_damage(damage_price: i32, weigh_price: i32, bonus: f64) -> (i32, i32, i32) {
     let mut rng = rand::thread_rng();
     
     let mut arm_damage: i32 = sqrt(damage_price) + rng.gen_range(0..(sqrt(damage_price) * 4)) - rng.gen_range(0..(sqrt(weigh_price) / 2)); 
+    let mut min_damage: i32 = sqrt(damage_price) + 0 - (sqrt(weigh_price) / 2);
+    let mut max_damage: i32 = sqrt(damage_price) + (sqrt(damage_price) * 4) - 0;
+    
     if arm_damage > 250 {
         arm_damage = 250;
     }
+    if min_damage > 250 {
+        min_damage = 250;
+    }
+    if max_damage > 250 {
+        max_damage = 250;
+    }
+
     arm_damage += rng.gen_range(0..((bonus * 50.0) as i32) + 5);
+    max_damage += ((bonus * 50.0) as i32) + 5;
+
     let rand = rng.gen_range(0..10);
 
     if arm_damage < 10 + rand {
         arm_damage = 10 + rand;
     }
-    arm_damage
+    if min_damage < 10 {
+        min_damage = 10;
+    }
+
+    if max_damage < 20 {
+        max_damage = 20;
+    }
+
+    (arm_damage, min_damage, max_damage)
 }
 
 fn calc_arm_weigh(damage: i32, weigh_price: i32, bonus: f64) -> i32 {
@@ -210,7 +327,50 @@ fn calc_arm_weigh(damage: i32, weigh_price: i32, bonus: f64) -> i32 {
     arm_weigh
 }
 
-fn calc_arm_price(damage: i32, weigh: i32) -> i32 {
+fn calc_arm_weigh_vertax(damage: i32, weigh_price: i32, bonus: f64, is_min: bool) -> i32 {
+    let mut arm_weigh: i32;
+    if is_min {
+        if damage < 200 {
+            arm_weigh = damage - sqrt(weigh_price) * 2 - (sqrt(weigh_price) * 5);
+            if arm_weigh < 5 {
+                arm_weigh = 5;
+            }
+            
+            arm_weigh -= ((bonus * 30.0) as i32) + 5;
+            if arm_weigh < 5 {
+                arm_weigh = -5;
+            }
+        }
+        else {
+            arm_weigh = damage - sqrt(weigh_price) - sqrt(weigh_price) * 3;
+            if arm_weigh < 15 {
+                arm_weigh = 15;
+            }
+
+            arm_weigh -= ((bonus * 30.0) as i32) + 5;
+            if arm_weigh < 15 {
+                arm_weigh = 5;
+            }
+        }
+    }
+    else { // maximum
+        if damage < 200 {
+            arm_weigh = damage - sqrt(weigh_price) * 2;
+            if arm_weigh < 5 {
+                arm_weigh = 5;
+            }
+        }
+        else {
+            arm_weigh = damage - sqrt(weigh_price);
+            if arm_weigh < 15 {
+                arm_weigh = 15;
+            }
+        }
+    }
+    arm_weigh
+}
+
+fn calc_arm_price(damage: i32, weigh: i32) -> (i32, i32, i32) {
     let mut sa = damage - weigh;
     if sa < 1 {
         sa = 1;
@@ -236,11 +396,20 @@ fn calc_arm_price(damage: i32, weigh: i32) -> i32 {
     let mut rng = rand::thread_rng();
 
     price= ((price as f64 * 0.8) + (rng.gen_range(0.0..(price as f64 * 0.4)))) as i32;
-	if price < 1000 {
+	let mut min_price = (price as f64 * 0.8) as i32;
+    let mut max_price = (price as f64 * 1.2) as i32;
+
+    if price < 1000 {
         price = 1000;
     }
+    if min_price < 1000 {
+        min_price = 1000;
+    }
+    if max_price < 1000 {
+        max_price = 1000;
+    }
 
-    price
+    (price, min_price, max_price)
 }
 
 #[cfg(test)]
@@ -264,7 +433,7 @@ mod tests {
         let weigh_price = 50;
         let bonus = 1.2;
         let damage = calc_acc_damage(damage_price, weigh_price, bonus);
-        println!("calc_acc_damage: {}", damage);
+        println!("calc_acc_damage: {:?}", damage);
     }
 
     #[test]
@@ -281,7 +450,7 @@ mod tests {
         let damage = 15;
         let weigh = -1;
         let price = calc_acc_price(damage, weigh);
-        println!("calc_acc_price: {}", price);
+        println!("calc_acc_price: {:?}", price);
     }
 
     #[test]
@@ -290,7 +459,7 @@ mod tests {
         let weigh_price = 600;
         let bonus = 1.4;
         let damage = calc_arm_damage(damage_price, weigh_price, bonus);
-        println!("calc_arm_damage: {}", damage);
+        println!("calc_arm_damage: {:?}", damage);
     }
 
     #[test]
@@ -307,6 +476,6 @@ mod tests {
         let damage = 111;
         let weigh = -4;
         let price = calc_arm_price(damage, weigh);
-        println!("calc_arm_price: {}", price);
+        println!("calc_arm_price: {:?}", price);
     }
 }
