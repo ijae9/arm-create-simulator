@@ -1,0 +1,15 @@
+{
+  "name": "arm-create-simulator",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "arm_create_simulator_bg.wasm",
+    "arm_create_simulator.js",
+    "arm_create_simulator.d.ts"
+  ],
+  "main": "arm_create_simulator.js",
+  "types": "arm_create_simulator.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
