@@ -4,8 +4,8 @@ import init, { make_town_equipment } from "./pkg/arm_create_simulator.js";
 async function createWeapon() {
   await init(); // WASM 모듈 초기화
 
+  const equipmentType = parseInt(document.getElementById("equipmentType").value);
   const weaponType = parseInt(document.getElementById("weaponType").value);
-  const armType = parseInt(document.getElementById("armType").value);
   const damagePrice = parseInt(document.getElementById("damagePrice").value);
   const weightPrice = parseInt(document.getElementById("weightPrice").value);
   const weaponElement = parseInt(document.getElementById("weaponElement").value);
@@ -13,8 +13,8 @@ async function createWeapon() {
   const guildElement = parseInt(document.getElementById("guildElement").value);
 
   const equipment = make_town_equipment(
+    equipmentType,
     weaponType,
-    armType,
     damagePrice,
     weightPrice,
     weaponElement,

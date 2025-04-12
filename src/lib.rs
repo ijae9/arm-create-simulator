@@ -38,7 +38,7 @@ pub enum ElementType {
     Dark = 7,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 struct Equipment {
     damage: i32,
     weight: i32,
@@ -248,6 +248,17 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_make_arm() {
+        let damage_price = 300;
+        let weigh_price = 600;
+        let bonus = 1.4;
+        let weapon_type = WeaponType::Axe;
+        let equipment = make_arm(damage_price, weigh_price, bonus, &weapon_type);
+        println!("make_arm: {:?}", equipment);
+    }
+
+
+    #[test]
     fn test_calc_acc_damage() {
         let damage_price = 100;
         let weigh_price = 50;
@@ -275,9 +286,9 @@ mod tests {
 
     #[test]
     fn test_calc_arm_damage() {
-        let damage_price = 15;
-        let weigh_price = -1;
-        let bonus = 1.2;
+        let damage_price = 300;
+        let weigh_price = 600;
+        let bonus = 1.4;
         let damage = calc_arm_damage(damage_price, weigh_price, bonus);
         println!("calc_arm_damage: {}", damage);
     }
