@@ -1,0 +1,83 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>무기 생성</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>장비 생성</h1>
+
+    <label>장비 타입</label>
+    <select id="armType">
+      <option value="1">무기</option>
+      <option value="2">방어구</option>
+      <option value="3">악세서리</option>
+    </select>
+    
+    <label>무기 타입</label>
+    <select id="weaponType">
+      <option value="1">검</option>
+      <option value="2">창</option>
+      <option value="3">도끼</option>
+      <option value="4">너클</option>
+      <option value="5">활</option>
+      <option value="6">지팡이</option>
+      <option value="7">나이프</option>
+    </select>
+
+    <label>데미지 투자 비용</label>
+    <input type="number" id="damagePrice" />
+
+    <label>무게 투자 비용</label>
+    <input type="number" id="weightPrice" />
+
+    <label>무기 속성</label>
+    <select id="weaponElement">
+      <option value="1">불</option>
+      <option value="2">바람</option>
+      <option value="3">별</option>
+      <option value="4">번개</option>
+      <option value="5">물</option>
+      <option value="6">빛</option>
+      <option value="7">어둠</option>
+    </select>
+
+    <label>마을 속성</label>
+    <select id="townElement">
+        <option value="1">불</option>
+        <option value="2">바람</option>
+        <option value="3">별</option>
+        <option value="4">번개</option>
+        <option value="5">물</option>
+        <option value="6">빛</option>
+        <option value="7">어둠</option>
+    </select>
+
+    <label>길드 속성</label>
+    <select id="guildElement">
+        <option value="1">불</option>
+        <option value="2">바람</option>
+        <option value="3">별</option>
+        <option value="4">번개</option>
+        <option value="5">물</option>
+        <option value="6">빛</option>
+        <option value="7">어둠</option>
+    </select>
+
+    <button onclick="createWeapon()">장비 생성</button>
+  </div>
+
+  <div id="result" class="result-box" style="display: none;">
+    <h2>생성된 장비 정보</h2>
+    <p><strong>위력:</strong> <span id="result-power"></span></p>
+    <p><strong>무게:</strong> <span id="result-weight"></span></p>
+    <p><strong>가격:</strong> <span id="result-price"></span></p>
+  </div>
+
+  <script type="module" src="index.js"></script>
+</body>
+</html>
